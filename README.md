@@ -1,1 +1,1 @@
-vulcan webscraper
+vulcan web
