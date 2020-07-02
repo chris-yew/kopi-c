@@ -18,8 +18,8 @@ class vulcan:
         web_links = soup.find_all('a',class_ = 'article-list-item')
 
         def striphtml(data):
-        p = re.compile(r'<.*?>')
-        return p.sub('', data)
+            p = re.compile(r'<.*?>')
+            return p.sub('', data)
 
 
         for i in web_links:
@@ -40,10 +40,12 @@ class vulcan:
                 rest=res.split(sep,1)[0]
                 self.stories.append(striphtml(rest))
 
+        return self.stories ## turn into html? ##
+
         
 
     def extract(self):
-
+        
     
 
 
