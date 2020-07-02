@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import gensim
 import requests
 import re
+from gensim.summarization import summarize
 
 class vulcan:
     def __init__ (self,url):
@@ -45,7 +46,12 @@ class vulcan:
         
 
     def extract(self):
+        stories=self.scrap()
+        for i in stories:
+            self.summaries.append(summarize(i,ratio=0.2))
+        return self.summaries ## turn into html?##
         
+
     
 
 
