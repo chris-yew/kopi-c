@@ -43,7 +43,6 @@ class vulcan:
 
         return self.stories ## turn into html? ##
 
-        
 
     def extract(self):
         stories=self.scrap()
