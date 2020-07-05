@@ -6,7 +6,7 @@ from gensim.summarization import summarize
 
 class vulcan:
     def __init__ (self,url):
-        url=self.url
+        self.url=url
         self.links=[]
         self.stories=[]
         self.pstories=[]
@@ -17,6 +17,7 @@ class vulcan:
         page=requests.get(self.url)
         soup = BeautifulSoup(page.content, 'html.parser')
         web_links = soup.find_all('a',class_ = 'article-list-item')
+        print(web_links)
 
         def striphtml(data):
             p = re.compile(r'<.*?>')
@@ -25,7 +26,7 @@ class vulcan:
 
         for i in web_links:
             self.links.append('https://vulcanpost.com/'+ i['href'])
-        
+            
         
         for i in self.links:
             page=requests.get(i)
@@ -40,15 +41,18 @@ class vulcan:
                 sep="Featured Image Credit"
                 rest=res.split(sep,1)[0]
                 self.stories.append(striphtml(rest))
-
+        print(self.stories)
         return self.stories ## turn into html? ##
-
 
     def extract(self):
         stories=self.scrap()
         for i in stories:
             self.summaries.append(summarize(i,ratio=0.2))
         return self.summaries ## turn into html?##
+
+test=vulcan("https://vulcanpost.com/category/news/")
+result=test.scrap()
+print(result)
         
 
     
