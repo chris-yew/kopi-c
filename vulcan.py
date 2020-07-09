@@ -7,6 +7,8 @@ import re
 import gensim
 from gensim.summarization import summarize
 
+## dataframe ##
+import pandas as pd
 
 
 #obtain the url of the site that we want to scrapt
@@ -68,8 +70,6 @@ for i in pstories:
 # for every article, find the tag that contains the story and scrape 
 # append results into array
 
-
-
 for j in range(len(articles)):
     results.append((articles[j],links[j],stories[j]))
 #print(results)
@@ -77,9 +77,14 @@ for j in range(len(articles)):
 for i in stories:
     summaries.append(summarize(i,ratio=0.2))
 
+news={"links":links,"summaries":summaries}
 
+#print(stories[7])
+print(summarize(stories[5]))
+#df=pd.DataFrame(data=news)
+#df.to_csv (r'C:\Users\Byron\Desktop\kopic\export_dataframe.csv', index = False, header=True)
+#print(df)
 
-print(web_links)
 
 
 
