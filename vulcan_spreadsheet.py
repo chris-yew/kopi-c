@@ -2,18 +2,28 @@
 from bs4 import BeautifulSoup
 import requests
 import re
+from datetime import datetime
 
 ## summarize ##
 import gensim
 from gensim.summarization import summarize
+from gensim.summarization import keywords
 
 ## dataframe ##
 import pandas as pd
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
 
 #obtain the url of the site that we want to scrapt
 url = 'https://vulcanpost.com/category/news/'
 page = requests.get(url)
+
+#store date#
+date_str=[]
+
+#stores timestamp#
+time_stamp=[]
 
 #store the articles 
 articles =[]
@@ -24,6 +34,9 @@ links = []
 #stores the results
 results = []
 
+#stores inital stories
+story=[]
+
 #stores the polluted stories
 pstories=[]
 
@@ -32,6 +45,9 @@ stories=[]
 
 #stores summarized stories
 summaries=[]
+
+#update spreadsheet"
+database=[]
 
 soup = BeautifulSoup(page.content, 'html.parser')
 #print(soup.p)
@@ -51,18 +67,31 @@ for i in web_links:
 for i in links:
     page=requests.get(i)
     soup=BeautifulSoup(page.content,'html.parser')
-    #story=soup.find_all('p')
-    story=soup.find_all(attrs={'class' : "entry mx-3 mx-md-5 "})
-    pstories.append(story.text)
+    time=soup.find_all(class_="timestamp timeago")
+    for j in time:
+        date_str.append(j["title"])
+    story.append(soup.find_all(attrs={'class' : 'entry mx-3 mx-md-5'})) 
+
+for i in story:
+    for j in i:
+            pstories.append(j.text)
+
 
 def striphtml(data):
     p = re.compile(r'<.*?>')
     return p.sub('', data)
 
+for i in date_str:
+    date = datetime.strptime(i, '%Y-%m-%d %H:%M:%S')
+    timestamp = datetime.timestamp(date)
+    time_stamp.append(timestamp)
+
 for i in pstories:
     res=""
     for p in i:
         res+=str(p)
+    res=re.sub(r"\n","",res)
+    res=re.sub(r"Image Credit:","",res)
     sep="Featured Image Credit"
     rest=res.split(sep,1)[0]
     stories.append(striphtml(rest))
@@ -71,62 +100,25 @@ for i in pstories:
 # for every article, find the tag that contains the story and scrape 
 # append results into array
 
-for j in range(len(articles)):
-    results.append((articles[j],links[j],stories[j]))
+#for j in range(len(articles)):
+#    results.append((time_stamp[j],articles[j],links[j],stories[j]))
 #print(results)
 
 for i in stories:
     summaries.append(summarize(i,ratio=0.2))
 
-news={"links":links,"summaries":summaries}
+## spreadsheet ##
+scope= ["https://spreadsheets.google.com/feeds",'https://www.googleapis.com/auth/spreadsheets',"https://www.googleapis.com/auth/drive.file","https://www.googleapis.com/auth/drive"]
+creds=ServiceAccountCredentials.from_json_keyfile_name('vulcan_secret.json', scope)
+client = gspread.authorize(creds)
 
-#print(stories[7])
-#print(summarize(stories[5]))
-df=pd.DataFrame(data=news)
-df.to_csv (r'C:\Users\Byron\Desktop\kopic\export_dataframe.csv', index = False, header=True)
-#print(df)
-
-print(pstories[0])
+sheet=client.open("vulcan").sheet1
 
 
+for i in range(len(links)):
+    database.append([time_stamp[i],links[i],summaries[i]])
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+for i in database:
+    sheet.insert_row(i)
 
 
