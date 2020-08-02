@@ -9,7 +9,7 @@ def read_token_from_config_file(config):
         parser.read(config)
         return parser.get("creds","token")
 
-bot=telebot.TeleBot(token="1275510378:AAHdHaEYrlIuDFDkm7SXZ7boWb1nSPwrdzw")
+bot=telebot.TeleBot(token="...")
 
 @bot.message_handler(commands=['news'])
 def send_welcome(message):
